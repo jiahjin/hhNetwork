@@ -8,11 +8,12 @@ CPPFLAGS  = -Wall
 
 # The build target 
 TARGET = helloWorld
+FUNC1 = other
 
 all: $(TARGET)
 
-$(TARGET): $(TARGET).cpp
-	$(CC) $(CPPFLAGS) $(TARGET).cpp -o build/$(TARGET).o 
+$(TARGET): src/$(TARGET).cpp
+	$(CC) $(CPPFLAGS) src/$(TARGET).cpp src/$(FUNC1).cpp -o build/$(TARGET).o 
 
 clean:
 	$(RM) build/$(TARGET).o
