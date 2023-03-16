@@ -12,7 +12,7 @@ TARGET = helloWorld
 all: $(TARGET)
 
 $(TARGET): $(TARGET).cpp
-		$(CC) $(CPPFLAGS) $(TARGET).cpp -o build/$(TARGET).o 
+	$(CC) $(CPPFLAGS) $(TARGET).cpp -o build/$(TARGET).o 
 
 clean:
-		$(RM) build/$(TARGET).o
+	$(RM) build/$(TARGET).o
