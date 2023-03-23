@@ -9,12 +9,14 @@ import sympy as sy
 numc= 2
 
 def alpham(v):
-    theta = (v+45)/10
-    if theta ==0:
-        a = 1.0
-    else:
-        a = 1.0*theta/(1-np.exp(-theta))
+    theta = (v + 45) / 10
+    a = np.zeros_like(v, dtype=float)
+    mask = (theta != 0)
+    a[mask] = 1.0 * theta[mask] / (1 - np.exp(-theta[mask]))
+    a[~mask] = 1.0
     return a
+
+
 def betam(v):
     theta = (v+70)/18
     b = 4.0*np.exp(-theta)
@@ -29,13 +31,15 @@ def betah(v):
     b=1.0/(1+np.exp(-theta));
     return b
 
+
 def alphan(v):
     theta=(v+60)/10
-    if theta== 0:
-        a = 0.1
-    else:
-        a=0.1*theta/(1-np.exp(-theta));
+    a = np.zeros_like(v, dtype=float)
+    mask = (theta != 0)
+    a[mask] = 0.1 * theta[mask] / (1 - np.exp(-theta[mask]))
+    a[~mask] = 0.1
     return a
+
 def betan(v):
     theta = (v+70)/80;
     b=0.125*np.exp(-theta); 

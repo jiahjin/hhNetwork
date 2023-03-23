@@ -49,27 +49,27 @@ t_plot=[]
 #the neuron is at rest (v= -70 mV) prior to t=O;
 #at t=O a current shock is applied after which v= -55 mV;
 #voltage prior to t=O:
-vhold= [-70 for _ in range(numc)]
+vhold=np.array( [-70 for _ in range(numc)])
 #voltage just after t=O:
 #vstart= -55; %(mV)
-vstart= [-55 for _ in range(numc)]
+vstart= np.array([-55 for _ in range(numc)])
 #(change in v is result of current shock applied at t=O)
 
 #simulate time prior to t=O: 
 
 #set m,h,n equal to their steady values
 #under constant-v conditions:
-m =[0]*numc; h=[0]*numc; n =[0]*numc
-for i in range(numc):
-    v=vhold[i]
-    m[i]=alpham(v)/(alpham(v)+betam(v))
-    h[i]=alphah(v)/(alphah(v)+betah(v))
-    n[i]=alphan(v)/(alphan(v)+betan(v))
-    
+v = vhold
+m = alpham(v)/(alpham(v)+betam(v))
+h = alphah(v)/(alphah(v)+betah(v))
+n = alphan(v)/(alphan(v)+betan(v))
+
+
 # compute initial r
 taur = 0.5;
 taud = 8; 
 V0 = 20;
+Vsyn = 20
 ri = 1-1/taud/(1+np.exp(-v+V0));
 r = [ri]*numc
 
@@ -90,7 +90,9 @@ check=1
 #set check=O to disable self-checking 
 
 def snew(s_old, alpha, beta, dt):
-    s=(s_old+dt*alpha)/(1+dt*(alpha+beta))
+    s =(s_old+dt*alpha)/(1+dt*(alpha+beta))
+
+    
     # if(check):
     #     chsnew = (s-s_old)/dt -(alpha*(1-s)-beta*s)
     return s
@@ -113,17 +115,20 @@ def izero(t):
     return i
 
 
+# VS = sy.IndexedBase('VS', numc)
+# var = []
+# eqn =[0]*numc
+# for i in range(numc):
+#     var.append(VS[i])
+#     eqn[i] = VS[i]-5
 
-VS = sy.IndexedBase('VS', numc)
-var = []
-for i in range(numc):
-    var.append(VS[i])
+# s = sy.solve(eqn, var)
+# print(s)
 
-rj = sy.Matrix(rnew([1, 2, 3], var))
-s = sy.solve(rj, var)
+# real_solutions = np.fromiter((sy.re(value) for value in s.values()), dtype=float)
 
-real_solutions = np.fromiter((sy.re(value) for value in s.values()), dtype=float)
+# print(real_solutions)
 
-print(real_solutions)
+
 
 
