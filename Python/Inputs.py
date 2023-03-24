@@ -9,9 +9,10 @@ import sympy as sy
 from ocrate import *
 
 # nxnsynaptic adjacency matrix
-a = np.array([[0, 1, 1],
-              [1, 0, 1],
-              [1, 1, 0]])
+a = np.array([[0, 0, 0, 0],
+              [0, 0, 1, 1],
+              [0, 1, 0, 1],
+              [0, 1, 1, 0]])
 # numc = n
 numc = len(a)
 
@@ -32,17 +33,18 @@ EK = -82; #(mV)
 #leakage channel reversal potential:
 EL = -59; #(mV)
 #maximum specific conductance:
-gcbar = 0.04;
+gcbar = 0.4;
 
 #initialize time step and experiment duration:
 dt=0.1; #time step duration (ms)
-tmax=1; #duration of experiment (ms)
+tmax=16; #duration of experiment (ms)
 #total number of time steps in the experiment:
 klokmax= np.ceil(tmax/dt); #round up to integer
 
 #initialize arrays that hold data for plotting:
 mhn_plot=[]
-v_plot=[]
+v_plot=np.empty((int(klokmax),numc))
+# v_plot = []
 t_plot=[]
 
 #initialize parameters that define the experiment:
@@ -71,7 +73,7 @@ taud = 8;
 V0 = 20;
 Vsyn = 20
 ri = 1-1/taud/(1+np.exp(-v+V0));
-r = [ri]*numc
+r = ri
 
 #now let voltage jump to its value
 #just after t=O, without making
@@ -83,11 +85,13 @@ v=vstart;
 t1p=10; #starting time (ms)
 t2p=t1p+1; #stopping time (ms) 
 ip=50;  #current applied (muA) 
+def izero(t):
+    if(t1p<t) and (t<t2p):
+        i=ip; #i=ip when t1p<t<t2p
+    else:
+        i=0
+    return i
 
-#initialize checking parameter
-check=1
-#set check=l to enable self-checking
-#set check=O to disable self-checking 
 
 def snew(s_old, alpha, beta, dt):
     s =(s_old+dt*alpha)/(1+dt*(alpha+beta))
@@ -105,15 +109,14 @@ def rnew(r_old, Vj):
         r_den = 1 + dt*((1/taur - 1/taud)/(1+sy.exp(-Vj[i]+V0)) + 1/taud)
         rji = r_num/r_den
         rj.append(rji)
+    rj = np.array(rj).astype(float)
     return rj
 
-def izero(t):
-    if(t1p<t) and (t<t2p):
-        i=ip; #i=ip when t1p<t<t2p
-    else:
-        i=0
-    return i
 
+#initialize checking parameter
+check=1
+#set check=l to enable self-checking
+#set check=O to disable self-checking 
 
 # VS = sy.IndexedBase('VS', numc)
 # var = []

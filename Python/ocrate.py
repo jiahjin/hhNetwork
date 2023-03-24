@@ -6,7 +6,7 @@ Created on Thu Mar 16 17:56:47 2023
 """
 import numpy as np
 import sympy as sy
-numc= 2
+
 
 def alpham(v):
     theta = (v + 45) / 10
