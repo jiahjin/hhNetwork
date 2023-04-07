@@ -9,10 +9,9 @@ import sympy as sy
 from ocrate import *
 
 # nxnsynaptic adjacency matrix
-a = np.array([[0, 0, 0, 0],
-              [0, 0, 1, 1],
-              [0, 1, 0, 1],
-              [0, 1, 1, 0]])
+a = np.array([[0, 1, 0],
+              [1, 0, 1],
+              [0, 1, 0]])
 # numc = n
 numc = len(a)
 
@@ -27,17 +26,17 @@ gKbar=36; #((muA/mV)/cm~2)
 #leakage conductance per unit area:
 gLbar=0.3; #((muA/mV)/cm~2) 
 #Na+ equilibrium potential: 
-ENa = 45; #(mV)
+ENa = 55; #(mV)
 #K+ equilibrium potential:
-EK = -82; #(mV)
+EK = -72; #(mV)
 #leakage channel reversal potential:
-EL = -59; #(mV)
+EL = -49; #(mV)
 #maximum specific conductance:
 gcbar = 0.4;
 
 #initialize time step and experiment duration:
 dt=0.1; #time step duration (ms)
-tmax=16; #duration of experiment (ms)
+tmax=30; #duration of experiment (ms)
 #total number of time steps in the experiment:
 klokmax= np.ceil(tmax/dt); #round up to integer
 
@@ -55,13 +54,16 @@ vhold=np.array( [-70 for _ in range(numc)])
 #voltage just after t=O:
 #vstart= -55; %(mV)
 vstart= np.array([-55 for _ in range(numc)])
+v = vhold
 #(change in v is result of current shock applied at t=O)
 
 #simulate time prior to t=O: 
 
 #set m,h,n equal to their steady values
 #under constant-v conditions:
-v = vhold
+
+# print(alpham(v))
+betam(v)
 m = alpham(v)/(alpham(v)+betam(v))
 h = alphah(v)/(alphah(v)+betah(v))
 n = alphan(v)/(alphan(v)+betan(v))
@@ -82,21 +84,52 @@ v=vstart;
 
 #then a subsequent 15 muA current pulse of 1 ms duration
 #is applied beginning at t=lO ms.
-t1p=10; #starting time (ms)
-t2p=t1p+1; #stopping time (ms) 
+def poisrand(n,lamb):
+    poisrand = np.empty(n)
+    
+    for i in range(n):
+        xt = 0
+        t = 0
+        while t<1:
+            x = xt
+            y = -(1/lamb)*np.log(1-np.random.uniform())
+            t = t+y
+            xt = xt+1
+        poisrand[i] = x
+    return poisrand
+lamb = 10
+t1p=poisrand(numc,lamb) #starting time (ms)
+# t2p=t1p+0.5; #stopping time (ms) 
 ip=50;  #current applied (muA) 
-def izero(t):
+
+def izero(t,t1p):
+    t2p=t1p+0.5
     if(t1p<t) and (t<t2p):
         i=ip; #i=ip when t1p<t<t2p
     else:
         i=0
     return i
 
+# def izero(t):
+#     iz = np.zero(numc)
+#     for i in range(numc)
+#         if(t1p[i]<t) and (t<t2p[i]):
+#         i=ip; #i=ip when t1p<t<t2p
+#     else:
+#         i=0
+#     return i
+
 
 def snew(s_old, alpha, beta, dt):
-    s =(s_old+dt*alpha)/(1+dt*(alpha+beta))
-
+    k1 = alpha*(1-s_old)-beta*(s_old)
+    k2 = alpha*(1-(s_old+0.5*dt*k1))-beta*(s_old+0.5*dt*k1)
+    k3 = alpha*(1-(s_old+0.5*dt*k2))-beta*(s_old+0.5*dt*k2)
+    k4 = alpha*(1-(s_old+dt*k3))-beta*(s_old+dt*k3)
+    s = s_old + (dt/6)*(k1+2*k2+2*k3+k4)
     
+    
+    
+    # s =(s_old+dt*alpha)/(1+dt*(alpha+beta))
     # if(check):
     #     chsnew = (s-s_old)/dt -(alpha*(1-s)-beta*s)
     return s
@@ -131,7 +164,6 @@ check=1
 # real_solutions = np.fromiter((sy.re(value) for value in s.values()), dtype=float)
 
 # print(real_solutions)
-
 
 
 

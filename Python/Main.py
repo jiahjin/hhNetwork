@@ -12,6 +12,7 @@ from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
 
 # Define symbols for voltage variables
+
 VS = sy.symbols('VS0:%d' % numc)
 
 for klok in range (int(klokmax)):
@@ -33,7 +34,7 @@ for klok in range (int(klokmax)):
         rj = rnew(r,VS)
         for i in range (numc):
             Isyn = gcbar*(Vsyn-VS[i])*sum(a[i, :]*rj)
-            eqn.append(VS[i]-(v[i]+(dt/C)*(gE[i]+izero(t)+Isyn))/(1+(dt/C)*g[i]))
+            eqn.append(VS[i]-(v[i]+(dt/C)*(gE[i]+izero(t,t1p[i])+Isyn))/(1+(dt/C)*g[i]))
         return np.array(eqn)
     sol = fsolve(equations, VS)
     v = np.array(sol)    
@@ -43,7 +44,7 @@ for klok in range (int(klokmax)):
         v_plot[klok][i]=v[i]
    
     r = rnew(r,v)
-print(v_plot)    
+# print(v_plot)    
 plt.figure()
 plt.plot(t_plot, v_plot)
 # plt.plot(v_plot[:,1], v_plot[:,2])
